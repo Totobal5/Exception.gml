@@ -1,0 +1,11 @@
+{
+  "$GMNotes":"",
+  "%Name":"Exception_License",
+  "name":"Exception_License",
+  "parent":{
+    "name":"Extensions",
+    "path":"folders/Scripts/Extensions.yy",
+  },
+  "resourceType":"GMNotes",
+  "resourceVersion":"2.0",
+}

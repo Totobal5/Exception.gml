@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "Exception",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "Scripts",
-    "path": "folders/Scripts.yy",
+  "$GMScript":"v1",
+  "%Name":"Exception",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Exception",
+  "parent":{
+    "name":"Extensions",
+    "path":"folders/Scripts/Extensions.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }
