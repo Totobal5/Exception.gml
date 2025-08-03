@@ -1,5 +1,5 @@
 /// @ignore
-#macro  __GMLEXCEPTION_VERSION "0.6"
+#macro  __GMLEXCEPTION_VERSION "1.0"
 show_debug_message($"GMLException version: {__GMLEXCEPTION_VERSION}");
 /// @ignore
 globalvar __YYGMLException_static;
