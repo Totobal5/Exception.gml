@@ -1,5 +1,9 @@
 {
-  "FolderOrderSettings":[],
+  "FolderOrderSettings":[
+    {"name":"Exception","order":3,"path":"folders/Exception.yy",},
+    {"name":"Rooms","order":1,"path":"folders/Rooms.yy",},
+    {"name":"Scripts","order":2,"path":"folders/Scripts.yy",},
+  ],
   "ResourceOrderSettings":[
     {"name":"Exception_License","order":2,"path":"notes/Exception_License/Exception_License.yy",},
     {"name":"ExampleExceptions","order":1,"path":"scripts/ExampleExceptions/ExampleExceptions.yy",},

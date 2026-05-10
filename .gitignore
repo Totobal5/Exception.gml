@@ -1,0 +1,6 @@
+.github/*
+!.github/workflows/
+!.github/workflows/**
+manual/
+copilot-instructions.md
+.gmcache

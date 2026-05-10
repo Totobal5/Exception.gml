@@ -1,3 +1,2 @@
-/// @description 
-// Configura el manejador de excepciones no capturadas tan pronto como se carga el script.
-Exception.setupUnhandledHandler();
+/// @description Setup the global unhandled exception handler to catch any exceptions.
+Exception.UnhandledHandler();

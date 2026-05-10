@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"Exception",
   "parent":{
-    "name":"Extensions",
-    "path":"folders/Scripts/Extensions.yy",
+    "name":"Exception",
+    "path":"folders/Exception.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

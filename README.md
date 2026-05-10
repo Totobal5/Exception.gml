@@ -1,230 +1,149 @@
 # GameMaker Exception Base Class
 
-[![Donate](https://img.shields.io/badge/donate-%E2%9D%A4-blue.svg)](https://musnik.itch.io/donate-me) [![License](https://img.shields.io/github/license/KeeVeeGames/Exception.gml)](#!)
+[![Donate](https://img.shields.io/badge/donate-%E2%9D%A4-blue.svg)](https://musnik.itch.io/donate-me)
+[![License](https://img.shields.io/github/license/KeeVeeGames/Exception.gml)](#!)
 
-This is a base class for custom exceptions. It replicates a structure of system exceptions and adding better support of [try-catch](https://manual-en.yoyogames.com/GameMaker_Language/GML_Overview/Language_Features/try_catch_finally.htm) and [exception_unhandled_handler](https://manual-en.yoyogames.com/GameMaker_Language/GML_Reference/Debugging/exception_unhandled_handler.htm) for these custom exceptions.
+`Exception.gml` is a base class for custom exceptions in GameMaker.
+It mirrors native exception fields and adds a consistent workflow for:
 
-The class is generating all the necessary exception fields and populates data for `script`, `line` and `stacktrace` ones. Makes output on error windows nicer and more meaningful on handled exceptions. Also adds better support for YYC.
+- `try...catch`
+- `exception_unhandled_handler`
+- crash report generation (`.exception` files)
 
-To create a custom exception inherit your constructor from `Exception`, write your `message` and `longMessage` and add `init()` call:
+The goal is to provide cleaner diagnostics across VM and YYC, with practical debugging metadata.
+
+## Features
+
+- Consistent exception fields: `message`, `longMessage`, `script`, `line`, `stacktrace`
+- Crash report file generation with environment metadata
+- Stable short crash signature (`Crash ID`)
+- Runtime metadata in reports (OS, Runtime, Build Type, etc.)
+- Snapshot capture support via `Snapshot(_value)`
+- Breadcrumb trail support via `Exception.Breadcrumb("...")`
+- Robust file save flow with `try...catch...finally` and JSON fallback to console
+
+## Quick Start
+
+Create a custom exception by inheriting from `Exception()`, setting `message` and `longMessage`, and calling `init()`.
+
 ```js
 function TestException() : Exception() constructor {
     message = "Throw a test exception.";
     longMessage = "Long\nMessage\nis\nhere";
-    
+
     init();
 }
 ```
 
-You can also not set both messages, which will make it hold just the exception class name, or make messages the same. Arguments are also supported:
+Arguments are supported:
+
 ```js
 function ArgumentException(expected_number, given_number) : Exception() constructor {
     message = string("Number of arguments expected {0}, got {1}", expected_number, given_number);
     longMessage = message;
-    
+
     init();
 }
 ```
 
-## Installation:
+## Snapshot and Breadcrumb Usage
 
-Copy the [Exception script](https://github.com/KeeVeeGames/Exception.gml/blob/master/Exception/scripts/Exception/Exception.gml) into your project.   
-Or get the latest asset package from the [releases page](../../releases) and import it into IDE.
+Use `Snapshot(_value)` inside the exception constructor before `init()`.
 
-## Comparison:
+```js
+function TestException() : Exception() constructor {
+    message = "Throw a test exception.";
+    longMessage = "Long\nMessage\nis\nhere";
 
-In GameMaker there are differences in error message appearance and exception data between different handling methods (try-catch or exception_unhandled_handler) and compile targets (VM or YYC).
+    Snapshot({ id: "EX-88902", description: "Snapshot example" });
+    Snapshot(self);
 
-This implementation tries to produce generally better and more consistent results in comparison to its alternatives.
+    init();
+}
+```
 
-### Built-in `throw "ArgumentException"`
+Use breadcrumbs globally before risky operations:
 
-<table>
-<thead>
-<tr>
-<th></th>
-<th width=360px>VM</th>
-<th width=360px>YYC</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>Unhandled</th>
-<td>
-<p align="center">
-<a href="https://keevee.games/wp-content/uploads/2023/05/Runner_qXFyONNYA9.png"><img src="https://keevee.games/wp-content/uploads/2023/05/Runner_qXFyONNYA9-300x265.png" alt="Error screenshot"></a>
-</p>
-</td>
-<td>
-<p align="center">
-<a href="https://keevee.games/wp-content/uploads/2023/05/Exception_HlRQBDDjyn.png"><img src="https://keevee.games/wp-content/uploads/2023/05/Exception_HlRQBDDjyn-300x265.png" alt="Error screenshot"></a>
-</p>
-</td>
-</tr>
-<tr></tr><tr>
-<th>try-catch</th>
-<td>"ArgumentException"&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</td>
-<td>"ArgumentException"&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</td>
-</tr>
-<tr></tr><tr>
-<th>
+```js
+Exception.Breadcrumb("F2 key pressed, about to throw ArgumentException");
+throw new ArgumentException(3, 2);
+```
 
-exception   
-unhandled   
-handler
+Also available:
 
-</th>
-<td>
+- `Exception.ClearBreadcrumbs()`
 
-`message`: "Unable to find a handler for exception ArgumentException"   
-`longMessage`:   
->"ERROR in   
-action number 1   
-of  Step Event0   
-for object obj_exception_test:   
->
->
->
->Unable to find a handler for exception ArgumentException
->
->
-> at gml_Script_ExceptionTest (line 66) -     throw "ArgumentException""   
+## Example `.exception` Report
 
-`script`: "gml_Script_ExceptionTest"   
-`line`: 66   
-`stacktrace`: [   
->"gml_Script_ExceptionTest (line 66)"
+```text
+========================================
+      GMLException Crash Report
+========================================
+Crash ID: EX-00LY3PZ3
+Version: 2.0.0
+Timestamp: 10-05-2026 05:42:37 PM
+OS Type: Windows (0)
+OS Version: 10.0
+Browser: not_a_browser (non-browser target or GX.games) (-1)
+Runtime Mode: VM
+Game Version: 1.0.0.0
+Runtime Version: 2024.14.4.268
+Build Type: run
+Build Date: 10-05-2026 05:42:35 PM
+Release Mode: 2025
 
->"gml_Object_obj_exception_Step_0 (line 8) -     ExceptionTest();"
+Snapshot:
+---------
+[]
 
-]
-</td>
-<td valign="top">"ArgumentException"</td>
-</tr>
-</tbody>
-</table>
+Breadcrumbs:
+------------
+  - [10-05-2026 05:42:37 PM] F2 key pressed, about to throw ArgumentException
 
-### Custom `throw new ArgumentException()`
+Short Message:
+--------------
+ArgumentException: Number of arguments expected 3, got 2
 
-<table>
-<thead>
-<tr>
-<th></th>
-<th width=360px>VM</th>
-<th width=360px>YYC</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>Unhandled</th>
-<td>
-<p align="center">
-<a href="https://keevee.games/wp-content/uploads/2023/05/Runner_HBtSdTN8U5.png"><img src="https://keevee.games/wp-content/uploads/2023/05/Runner_HBtSdTN8U5-300x265.png" alt="Error screenshot"></a>
-</p>
-</td>
-<td>
-<p align="center">
-<a href="https://keevee.games/wp-content/uploads/2023/05/Exception_5Y51n4jzzy.png"><img src="https://keevee.games/wp-content/uploads/2023/05/Exception_5Y51n4jzzy-300x265.png" alt="Error screenshot"></a>
-</p>
-</td>
-</tr>
-<tr></tr><tr>
-<th>try-catch</th>
-<td valign="top">
+Long Message / Formatted Output:
+--------------------------------
+ERROR in action number 1
+of  Step Event0 for object obj_exception_test:
+ArgumentException: Number of arguments expected 3, got 2
 
-`message`: "ArgumentException"   
-`longMessage`:   
->"ArgumentException   
-Number of arguments expected 3, got 2"   
+ at gml_Object_obj_exception_test_Step_0 (line 14) -     throw new ArgumentException(3, 2);
 
-`script`: "gml_Script_ExceptionTest"   
-`line`: 65   
-`stacktrace`: [   
->"gml_Script_ExceptionTest (line 65)"
 
->"gml_Object_obj_exception_Step_0 (line 8)
+Stacktrace:
+-----------
+  -> gml_Script_Exception (line 83)
+  -> gml_Script___handler@anon@19178@UnhandledHandler@anon@19141@Exception@Exception (line 606)
+  -> gml_Object_obj_exception_test_Step_0 (line 14)
 
-]
-</td>
-<td valign="top">
+========================================
+End of Report
+```
 
-`message`: "ArgumentException"   
-`longMessage`:   
->"Unable to find a handler for exception ArgumentException   
-Number of arguments expected 3, got 2"   
->   
->gml_Script_ExceptionTest (line 66)   
->gml_Object_obj_exception_Step_0 (line 9)
+## Installation
 
-`script`: "gml_Script_ExceptionTest"   
-`line`: 65   
-`stacktrace`: [   
->"gml_Script_ExceptionTest (line 65)"
+Copy the [Exception script](https://github.com/KeeVeeGames/Exception.gml/blob/master/Exception/scripts/Exception/Exception.gml) into your project.
 
->"gml_Object_obj_exception_test_Step_0 (line 8)
+Or get the latest asset package from the [releases page](../../releases) and import it into the IDE.
 
-]
-</td>
-</tr>
-<tr></tr><tr>
-<th>
+## Compatibility Notes
 
-exception   
-unhandled   
-handler
+- Confirmed in current work: Windows VM and Windows YYC.
+- HTML5/OperaGX parsing improvements are planned for a future release.
+- `os_browser` follows GameMaker behavior: GX.games returns `browser_not_a_browser`.
 
-</th>
-<td valign="top">
+## Manual References
 
-`message`: "Unable to find a handler for exception ArgumentException   
-Number of arguments expected 3, got 2"
-`longMessage`:   
->"ERROR in   
-action number 1   
-of  Step Event0   
-for object obj_exception_test:   
->
->
->
->Unable to find a handler for exception ArgumentException
->Number of arguments expected 3, got 2
->
->
-> at gml_Script_ExceptionTest (line 65) -         throw new ArgumentException(3, 2);"   
+- [try...catch...finally](https://manual.gamemaker.io/beta/en/GameMaker_Language/GML_Overview/Language_Features/try_catch_finally.htm)
+- [exception_unhandled_handler](https://manual.gamemaker.io/beta/en/GameMaker_Language/GML_Reference/Debugging/exception_unhandled_handler.htm)
+- [os_browser](https://manual.gamemaker.io/beta/en/GameMaker_Language/GML_Reference/OS_And_Compiler/os_browser.htm)
+- [weak_ref_create](https://manual.gamemaker.io/beta/en/GameMaker_Language/GML_Reference/Garbage_Collection/weak_ref_create.htm)
 
-`script`: "gml_Script_ExceptionTest"   
-`line`: 65   
-`stacktrace`: [   
->"gml_Script_ExceptionTest (line 65)"
+## Author
 
->"gml_Object_obj_exception_test_Step_0 (line 8) -     ExceptionTest();"
-
-]
-</td>
-<td valign="top">
-
-`message`: "ArgumentException: Number of arguments expected 3, got 2"   
-`longMessage`:   
->"Unable to find a handler for exception ArgumentException   
-Number of arguments expected 3, got 2
->
->gml_Script_ExceptionTest (line 66)   
->gml_Object_obj_exception_test_Step_0 (line 9)
-
-`script`: "gml_Script_ExceptionTest"   
-`line`: 66   
-`stacktrace`: [   
->"gml_Script_ExceptionTest (line 66)"
-
->"gml_Object_obj_exception_test_Step_0 (line 9)"
-
-]
-</td>
-</tr>
-</tbody>
-</table>
-
-## Author:
 Nikita Musatov - [MusNik / KeeVee Games](https://twitter.com/keeveegames)
 
 **License**: [MIT](https://en.wikipedia.org/wiki/MIT_License)
