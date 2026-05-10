@@ -29,5 +29,5 @@ jobs:
           package-name: "Exception"
           package-publisher: "Musnik"
           append-version-to-filename: "true"
-          project-tool-version: "2024.14.4"
+          project-tool-version: "2024.14.165"
           gmpm-registry: "https://gmpm.gamemaker.io"
