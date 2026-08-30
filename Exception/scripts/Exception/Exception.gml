@@ -1,5 +1,5 @@
 /// @ignore [MAJOR.MINOR.PATCH]
-#macro __GMLEXCEPTION_VERSION "2.0.0"
+#macro __GMLEXCEPTION_VERSION "2.1.0"
 /// @ignore Show debug messages for library alerts (Default: true).
 #macro __GMLEXCEPTION_ALERT true
 /// @ignore Show debug messages for library errors (Default: true).
@@ -10,12 +10,14 @@
 #macro __GMLEXCEPTION_SHOW_MESSAGE true
 /// @ignore Enable saving exception details to a file. This is required for the `SaveToFile` method and unhandled exception handler to work. (Default: true)
 #macro __GMLEXCEPTION_SAVE_TO_FILE true
+/// @ignore 
+#macro __GMLEXCEPTION_ERROR_ON_WARNING true
 
 /// @ignore Store the static struct of the system exception to inherit from it in our custom Exception class.
 globalvar __YYGMLException_static;
 
 show_debug_message($"GMLException Alert:: version: {__GMLEXCEPTION_VERSION}. made by MusNik");
-show_debug_message($"GMLException Alert:: Alert: {__GMLEXCEPTION_ALERT}, Error: {__GMLEXCEPTION_ERROR}, Strict Mode: {__GMLEXCEPTION_STRICT_MODE}, Show Message: {__GMLEXCEPTION_SHOW_MESSAGE}");
+show_debug_message($"GMLException Alert:: Alert: {__GMLEXCEPTION_ALERT}, Error: {__GMLEXCEPTION_ERROR}, Strict Mode: {__GMLEXCEPTION_STRICT_MODE}, Show Message: {__GMLEXCEPTION_SHOW_MESSAGE}, Error on Warning: {__GMLEXCEPTION_ERROR_ON_WARNING}");
 
 /// @ignore
 /// @param {String} msg Message to show in the alert.
@@ -39,6 +41,7 @@ function __gmlexception_error(_msg)
 // This should work on all platforms as show_error is implemented natively and will throw a YYGMLException that we can use as a template for our custom Exception class.
 try
 {
+    if (__GMLEXCEPTION_ERROR_ON_WARNING) { debug_event("ErrorOnWarning"); }
 	show_error("test", false);
 }
 catch (exception)

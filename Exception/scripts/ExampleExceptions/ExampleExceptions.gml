@@ -32,3 +32,8 @@ function NotImplementedException(method_name) : Exception() constructor
 	
 	init();
 }
+
+UnicClock()
+
+
+
